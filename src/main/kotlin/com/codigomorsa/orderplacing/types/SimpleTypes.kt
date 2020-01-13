@@ -37,7 +37,6 @@ data class OrderId(val orderId: Int)
 data class CustomerId(val customerId: Int)
 data class ProductCode(private val productCode: String50)
 data class ShippingAddress(val productCode: String50)
-data class ZipCode(val zipCode: String)
 data class Price(val price: Float)
 class BillingAmout private constructor(val amount: Float)
 
