@@ -24,3 +24,7 @@ data class UnvalidatedOrder(
         val shippingAddress: UnvalidatedAddress,
         val unvalidOrderLines: List<UnvalidatedOrderLine>
 )
+
+interface PlaceOrder {
+    fun place(order: UnvalidatedOrder): CompletableResult<UnvalidatedOrder, Exception>   // todo: define event output
+}

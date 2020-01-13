@@ -1,12 +1,14 @@
 package com.codigomorsa.orderplacing.types
 
 import java.lang.IllegalArgumentException
+import java.util.concurrent.CompletableFuture
 
 sealed class Result<out Success, out Failure>
 
 data class Success<out Success>(val value: Success) : Result<Success, Nothing>()
 data class Failure<out Failure>(val reason: Failure) : Result<Nothing, Failure>()
 
+data class CompletableResult<Success, Failure>(val result: CompletableFuture<Result<Success,Failure>>)
 
 class String50 private constructor(val value: String) {
     companion object {
