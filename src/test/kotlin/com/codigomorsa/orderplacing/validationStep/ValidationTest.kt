@@ -2,12 +2,11 @@ package com.codigomorsa.orderplacing.validationStep
 
 import com.codigomorsa.orderplacing.implementation.toAddress
 import com.codigomorsa.orderplacing.implementation.toCustomerInfo
+import com.codigomorsa.orderplacing.types.Failure
 import com.codigomorsa.orderplacing.types.UnvalidatedAddress
 import com.codigomorsa.orderplacing.types.UnvalidatedCustomerInfo
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import java.lang.IllegalArgumentException
 
 
 class ValidationTest {
@@ -48,23 +47,17 @@ class ValidationTest {
     @Test
     fun toCustomerTest() {
         val customerInfo = toCustomerInfo(unvalidatedCustomerInfoCorrect)
-        val exception: IllegalArgumentException = assertThrows {
-            val customerInfoError = toCustomerInfo(unvalidatedCustomerInfoInCorrectEmail)
-        }
+        val exception: Exception = (toCustomerInfo(unvalidatedCustomerInfoInCorrectEmail) as Failure).reason
         assertTrue(exception.message?.contains("Email address not valid.")?: false)
 
-        val exception2: IllegalArgumentException = assertThrows {
-            val customerInfoError = toCustomerInfo(unvalidatedCustomerInfoInCorrectName)
-        }
+        val exception2: Exception = (toCustomerInfo(unvalidatedCustomerInfoInCorrectName) as Failure).reason
         assertTrue(exception2.message?.contains("String must be not greater than 50 characters.")?: false)
     }
 
     @Test
     fun toAddressTest() {
         val address = toAddress(unvalidatedAddressCorrect)
-        val exception: IllegalArgumentException = assertThrows {
-            val addressError = toAddress(unvalidatedAddressTooLong)
-        }
+        val exception: Exception = (toAddress(unvalidatedAddressTooLong) as Failure).reason
         assertTrue(exception.message?.contains("String must be not greater than 50 characters.")?: false)
     }
 }
