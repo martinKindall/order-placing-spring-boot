@@ -18,7 +18,7 @@ fun toCustomerInfo(
         listOf(firstName, lastName, email).filter {
             it is Failure
         }.first().let {
-            throw (it as? Failure)?.reason?: IllegalArgumentException("Unknown Reason")
+            throw (it as? Failure)?.reason?:IllegalArgumentException("PlaceOrderImplementation: Unknown Reason")
         }
     }
 }
