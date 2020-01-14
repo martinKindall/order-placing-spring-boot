@@ -44,7 +44,7 @@ fun toAddress(unvalidatedAddress: UnvalidatedAddress): Result<Address, Exception
 fun toProductCode(
         checkProductCodeExists: CheckProductCodeExists,
         productCode: String): Result<ProductCode, Exception> {
-    val checkProduct: SwitchFun<ProductCode, ProductCode> = { aProductCode: ProductCode ->
+    val checkProduct = { aProductCode: ProductCode ->
         if (checkProductCodeExists(aProductCode)) {
             Success(aProductCode)
         } else {
