@@ -15,12 +15,9 @@ class MiscTests {
     inner class Cherry()
 
     @Test
-    fun bindTest() {
+    fun bindSuccessTest() {
         val appleToBanana  = { apple: Apple ->
             Success(Banana())
-        }
-        val bananaToPineApple = { banana: Banana ->
-            Success(PineApple())
         }
         val pineAppleToCherry = { pineApple: PineApple ->
             if (true) Success(Cherry()) else Failure(IllegalArgumentException(""))
@@ -29,11 +26,37 @@ class MiscTests {
         val anApple = Apple()
         val cherryResult =
                 appleToBanana(anApple).let {
-                    bind(bananaToPineApple, it)
+                    bind(::bananaToPineApple, it)
                 }.let {
                     bind(pineAppleToCherry, it)
                 }
 
         assertTrue((cherryResult as? Success)?.value is Cherry)
+    }
+
+    @Test
+    fun bindFailureTest() {
+        val appleToBanana = { apple: Apple ->
+            Failure(IllegalArgumentException("Apple not found."))
+        }
+        val pineAppleToCherry = { pineApple: PineApple ->
+            if (true) Success(Cherry()) else Failure(IllegalArgumentException("Pineapple not found."))
+        }
+
+        val anApple = Apple()
+        val cherryResult =
+                appleToBanana(anApple).let {
+                    bind(::bananaToPineApple, it)
+                }.let {
+                    bind(pineAppleToCherry, it)
+                }
+
+        assertTrue(
+            (cherryResult as? Failure)?.reason?.message?.contentEquals(
+                    "Apple not found.")?: false)
+    }
+
+    private fun bananaToPineApple(banana: Banana): Result<PineApple, Exception> {
+        return Success(PineApple())
     }
 }
