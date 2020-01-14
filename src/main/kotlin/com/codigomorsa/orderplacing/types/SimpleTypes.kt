@@ -35,9 +35,22 @@ class EmailAddress private constructor(val emailAddress: String) {
     }
 }
 
+class ProductCode private constructor(val productCode: String50) {
+    companion object {
+        fun create(code: String): Result<ProductCode, Exception> {
+            val productCode = String50.create(code)
+            return if (productCode is Success) {
+                Success(ProductCode(productCode.value))
+            } else {
+                Failure(IllegalArgumentException("Product code not valid."))
+            }
+        }
+    }
+}
+
 data class OrderId(val orderId: Int)
+data class OrderLineId(val orderId: Int)
 data class CustomerId(val customerId: Int)
-data class ProductCode(private val productCode: String50)
 data class ShippingAddress(val productCode: String50)
 data class Price(val price: Float)
 class BillingAmout private constructor(val amount: Float)

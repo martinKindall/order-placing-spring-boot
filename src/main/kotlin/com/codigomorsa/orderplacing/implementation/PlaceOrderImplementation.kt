@@ -1,9 +1,13 @@
 package com.codigomorsa.orderplacing.implementation
 
+import com.codigomorsa.orderplacing.Utils.SwitchFun
+import com.codigomorsa.orderplacing.Utils.bind
 import com.codigomorsa.orderplacing.types.*
 import kotlin.IllegalArgumentException
 import com.codigomorsa.orderplacing.types.Result
 import java.lang.Exception
+
+typealias CheckProductCodeExists = (x: ProductCode) -> Boolean
 
 fun toCustomerInfo(
         unvalidatedCustomerInfo: UnvalidatedCustomerInfo): CustomerInfo {
@@ -35,6 +39,21 @@ fun toAddress(unvalidatedAddress: UnvalidatedAddress): Address {
     } else {
         throw getErrorFromListOfResults(listOf(address, city, zipCode))
     }
+}
+
+fun toProductCode(
+        checkProductCodeExists: CheckProductCodeExists,
+        productCode: String): Result<ProductCode, Exception> {
+    val checkProduct: SwitchFun<ProductCode, ProductCode> = { aProductCode: ProductCode ->
+        if (checkProductCodeExists(aProductCode)) {
+            Success(aProductCode)
+        } else {
+            Failure(IllegalArgumentException("Product code doesn't exist"))
+        }
+    }
+
+    return ProductCode.create(productCode)
+            .let { bind(checkProduct, it) }
 }
 
 private fun getErrorFromListOfResults(results: List<Result<Any, Exception>>): Exception {
