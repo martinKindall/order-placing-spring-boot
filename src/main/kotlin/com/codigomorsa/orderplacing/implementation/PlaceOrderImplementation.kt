@@ -2,6 +2,8 @@ package com.codigomorsa.orderplacing.implementation
 
 import com.codigomorsa.orderplacing.types.*
 import kotlin.IllegalArgumentException
+import com.codigomorsa.orderplacing.types.Result
+import java.lang.Exception
 
 fun toCustomerInfo(
         unvalidatedCustomerInfo: UnvalidatedCustomerInfo): CustomerInfo {
@@ -15,10 +17,30 @@ fun toCustomerInfo(
                 email.value
         )
     } else {
-        listOf(firstName, lastName, email).filter {
-            it is Failure
-        }.first().let {
-            throw (it as? Failure)?.reason?:IllegalArgumentException("PlaceOrderImplementation: Unknown Reason")
-        }
+        throw getErrorFromListOfResults(listOf(firstName, lastName, email))
+    }
+}
+
+fun toAddress(unvalidatedAddress: UnvalidatedAddress): Address {
+    val address = String50.create(unvalidatedAddress.address)
+    val city = String50.create(unvalidatedAddress.city)
+    val zipCode = String50.create(unvalidatedAddress.zipCode)
+
+    if (address is Success && city is Success && zipCode is Success ) {
+        return Address(
+                address.value,
+                city.value,
+                zipCode.value
+        )
+    } else {
+        throw getErrorFromListOfResults(listOf(address, city, zipCode))
+    }
+}
+
+private fun getErrorFromListOfResults(results: List<Result<Any, Exception>>): Exception {
+    results.filter {
+        it is Failure
+    }.first().let {
+        return (it as? Failure)?.reason?:IllegalArgumentException("PlaceOrderImplementation: Unknown Reason")
     }
 }
