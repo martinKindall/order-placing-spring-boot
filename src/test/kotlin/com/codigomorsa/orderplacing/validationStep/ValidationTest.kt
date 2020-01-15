@@ -1,10 +1,10 @@
 package com.codigomorsa.orderplacing.validationStep
 
+import com.codigomorsa.orderplacing.implementation.CheckProductCodeExists
 import com.codigomorsa.orderplacing.implementation.toAddress
 import com.codigomorsa.orderplacing.implementation.toCustomerInfo
-import com.codigomorsa.orderplacing.types.Failure
-import com.codigomorsa.orderplacing.types.UnvalidatedAddress
-import com.codigomorsa.orderplacing.types.UnvalidatedCustomerInfo
+import com.codigomorsa.orderplacing.implementation.toProductCode
+import com.codigomorsa.orderplacing.types.*
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -15,6 +15,8 @@ class ValidationTest {
     private lateinit var unvalidatedCustomerInfoInCorrectName: UnvalidatedCustomerInfo
     private lateinit var unvalidatedAddressCorrect: UnvalidatedAddress
     private lateinit var unvalidatedAddressTooLong: UnvalidatedAddress
+    private lateinit var checkProductCodeExistsTrue: CheckProductCodeExists
+    private lateinit var checkProductCodeExistsFalse: CheckProductCodeExists
 
     init {
         unvalidatedCustomerInfoCorrect = UnvalidatedCustomerInfo(
@@ -42,11 +44,15 @@ class ValidationTest {
                 "Santiago",
                 "janeadfadsdfasdfasdfasdfadfasfasjaneadfadsdfasdfasdfasdfadfasfas"
         )
+        checkProductCodeExistsTrue = {true}
+        checkProductCodeExistsFalse = {false}
     }
 
     @Test
     fun toCustomerTest() {
         val customerInfo = toCustomerInfo(unvalidatedCustomerInfoCorrect)
+        assertTrue((customerInfo as? Success)?.value is CustomerInfo)
+
         val exception: Exception = (toCustomerInfo(unvalidatedCustomerInfoInCorrectEmail) as Failure).reason
         assertTrue(exception.message?.contains("Email address not valid.")?: false)
 
@@ -57,7 +63,15 @@ class ValidationTest {
     @Test
     fun toAddressTest() {
         val address = toAddress(unvalidatedAddressCorrect)
+        assertTrue((address as? Success)?.value is Address)
+
         val exception: Exception = (toAddress(unvalidatedAddressTooLong) as Failure).reason
         assertTrue(exception.message?.contains("String must be not greater than 50 characters.")?: false)
+    }
+
+    @Test
+    fun toProductCodeTest() {
+        val productCode = "asd123"
+        val validProductCode = toProductCode(checkProductCodeExistsTrue, productCode)
     }
 }
