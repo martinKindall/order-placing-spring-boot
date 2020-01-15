@@ -9,6 +9,18 @@ import java.lang.Exception
 
 typealias CheckProductCodeExists = (x: ProductCode) -> Boolean
 
+data class ValidatedOrder(
+        val orderId: OrderId,
+        val customerInfo: CustomerInfo,
+        val shippingAddress: ShippingAddress,
+        val lines: List<ValidatedOrderLine>
+)
+
+data class ValidatedOrderLine(
+        val orderLineId: OrderLineId,
+        val productCode: ProductCode,
+        val quantity: OrderQuantity)
+
 fun toCustomerInfo(
         unvalidatedCustomerInfo: UnvalidatedCustomerInfo): Result<CustomerInfo, Exception> {
     val firstName = String50.create(unvalidatedCustomerInfo.firstName)
