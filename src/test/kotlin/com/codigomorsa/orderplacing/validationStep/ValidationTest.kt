@@ -73,5 +73,15 @@ class ValidationTest {
     fun toProductCodeTest() {
         val productCode = "asd123"
         val validProductCode = toProductCode(checkProductCodeExistsTrue, productCode)
+        (validProductCode as? Success)?.value!!.let {
+            assertTrue(it.productCode.value == productCode)
+        }
+
+        val exception = (toProductCode(checkProductCodeExistsFalse, productCode) as Failure).reason
+        assertTrue(exception.message?.contains("Product code doesn't exist")?: false)
+
+        val productCodeTooLong = "sadfasdfasdfasdfasdfasdfadfasdfasdfasdfasdfasdfasdfasdf"
+        val exception2 = (toProductCode(checkProductCodeExistsTrue, productCodeTooLong) as Failure).reason
+        assertTrue(exception2.message?.contains("Product code not valid.")?: false)
     }
 }
