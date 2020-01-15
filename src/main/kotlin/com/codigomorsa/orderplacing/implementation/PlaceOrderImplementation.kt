@@ -1,6 +1,5 @@
 package com.codigomorsa.orderplacing.implementation
 
-import com.codigomorsa.orderplacing.Utils.SwitchFun
 import com.codigomorsa.orderplacing.Utils.bind
 import com.codigomorsa.orderplacing.types.*
 import kotlin.IllegalArgumentException
@@ -66,6 +65,20 @@ fun toProductCode(
 
     return ProductCode.create(productCode)
             .let { bind(checkProduct, it) }
+}
+
+fun toValidatedOrderLine(
+        checkProductCodeExists: CheckProductCodeExists,
+        unvalidatedOrderLine: UnvalidatedOrderLine): Result<ValidatedOrderLine, Exception> {
+    val validatedOrderLineAux = { product: ProductCode ->
+        Success(ValidatedOrderLine(
+                OrderLineId(unvalidatedOrderLine.orderLineId.toInt()),
+                product,
+                unvalidatedOrderLine.quantity
+        ))
+    }
+
+    return bind(validatedOrderLineAux, toProductCode(checkProductCodeExists, unvalidatedOrderLine.productCode))
 }
 
 private fun getErrorFromListOfResults(results: List<Result<Any, Exception>>): Exception {

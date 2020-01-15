@@ -1,7 +1,7 @@
 package com.codigomorsa.orderplacing.types
 
-import java.lang.IllegalArgumentException
 import java.util.concurrent.CompletableFuture
+import kotlin.IllegalArgumentException
 
 sealed class Result<out Success, out Failure>
 
@@ -53,10 +53,20 @@ data class OrderLineId(val orderId: Int)
 data class CustomerId(val customerId: Int)
 data class ShippingAddress(val productCode: String50)
 data class Price(val price: Float)
-class BillingAmout private constructor(val amount: Float)
+class BillingAmount private constructor(val amount: Float)
 
 sealed class OrderQuantity {
     data class UnitQuantity(val quantity: Int): OrderQuantity()
     data class KilogramQuantity(val quantity: Float): OrderQuantity()
+
+    companion object {
+        fun create(number: Any): OrderQuantity {
+            return when(number) {
+                is Int -> UnitQuantity(number)
+                is Float -> KilogramQuantity(number)
+                else -> throw IllegalArgumentException("Invalid quantity type")
+            }
+        }
+    }
 }
 

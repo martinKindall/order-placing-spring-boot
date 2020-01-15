@@ -15,7 +15,7 @@ data class UnvalidatedAddress(
 data class UnvalidatedOrderLine(
         val orderLineId: String,
         val productCode: String,
-        val quantity: Float
+        val quantity: OrderQuantity
 )
 
 data class UnvalidatedOrder(
