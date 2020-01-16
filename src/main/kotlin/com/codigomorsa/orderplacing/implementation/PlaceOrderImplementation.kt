@@ -1,17 +1,18 @@
 package com.codigomorsa.orderplacing.implementation
 
 import com.codigomorsa.orderplacing.Utils.bind
+import com.codigomorsa.orderplacing.Utils.listOfResultsToResult
 import com.codigomorsa.orderplacing.types.*
 import kotlin.IllegalArgumentException
 import com.codigomorsa.orderplacing.types.Result
-import java.lang.Exception
+import kotlin.Exception
 
 typealias CheckProductCodeExists = (x: ProductCode) -> Boolean
 
 data class ValidatedOrder(
         val orderId: OrderId,
         val customerInfo: CustomerInfo,
-        val shippingAddress: ShippingAddress,
+        val shippingAddress: Address,
         val lines: List<ValidatedOrderLine>
 )
 
@@ -84,11 +85,23 @@ fun toValidatedOrderLine(
 fun toValidatedOrder(
         checkProductCodeExists: CheckProductCodeExists,
         unvalidatedOrder: UnvalidatedOrder
-) {
+): Result<ValidatedOrder, Exception> {
+    val orderId = OrderId(unvalidatedOrder.orderId.toInt())
     val customerInfo = toCustomerInfo(unvalidatedOrder.customerInfo)
     val address = toAddress(unvalidatedOrder.shippingAddress)
-    val orderLinesResults = unvalidatedOrder.unvalidOrderLines.map {
+    val orderLines = listOfResultsToResult(unvalidatedOrder.unvalidOrderLines.map {
         toValidatedOrderLine(checkProductCodeExists, it)
+    })
+
+    return if (customerInfo is Success && address is Success && orderLines is Success) {
+        Success(ValidatedOrder(
+                orderId,
+                customerInfo.value,
+                address.value,
+                orderLines.value
+        ))
+    } else {
+        Failure(getErrorFromListOfResults(listOf(customerInfo, address, orderLines)))
     }
 }
 
