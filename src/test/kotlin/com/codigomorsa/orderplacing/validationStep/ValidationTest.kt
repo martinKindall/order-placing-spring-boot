@@ -50,13 +50,13 @@ class ValidationTest {
         unvalidatedOrderLineCorrect = UnvalidatedOrderLine(
                 "123",
                 "abc456",
-                OrderQuantity.create(12)
+                12f
         )
 
         unvalidatedOrderLineInCorrect = UnvalidatedOrderLine(
                 "123",
                 "janeadfadsdfasdfasdfasdfadfasfasjaneadfadsdfasdfasdfasdfadfasfas",
-                OrderQuantity.create(12)
+                12f
         )
     }
 

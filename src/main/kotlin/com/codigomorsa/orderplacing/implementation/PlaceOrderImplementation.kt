@@ -5,6 +5,7 @@ import com.codigomorsa.orderplacing.Utils.listOfResultsToResult
 import com.codigomorsa.orderplacing.types.*
 import kotlin.IllegalArgumentException
 import com.codigomorsa.orderplacing.types.Result
+import org.springframework.core.annotation.Order
 import kotlin.Exception
 
 typealias CheckProductCodeExists = (x: ProductCode) -> Boolean
@@ -75,7 +76,7 @@ fun toValidatedOrderLine(
         Success(ValidatedOrderLine(
                 OrderLineId(unvalidatedOrderLine.orderLineId.toInt()),
                 product,
-                unvalidatedOrderLine.quantity
+                OrderQuantity.create(unvalidatedOrderLine.quantity)
         ))
     }
 

@@ -50,10 +50,6 @@ class ProductCode private constructor(val productCode: String50) {
 
 data class OrderId(val orderId: Int)
 data class OrderLineId(val orderId: Int)
-data class CustomerId(val customerId: Int)
-data class ShippingAddress(val productCode: String50)
-data class Price(val price: Float)
-class BillingAmount private constructor(val amount: Float)
 
 sealed class OrderQuantity {
     data class UnitQuantity(val quantity: Int): OrderQuantity()
