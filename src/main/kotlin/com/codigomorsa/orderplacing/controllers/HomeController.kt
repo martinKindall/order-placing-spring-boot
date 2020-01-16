@@ -1,10 +1,7 @@
 package com.codigomorsa.orderplacing.controllers
 
-import com.codigomorsa.orderplacing.implementation.ValidatedOrder
-import com.codigomorsa.orderplacing.implementation.toValidatedOrder
 import com.codigomorsa.orderplacing.services.OrderService
 import com.codigomorsa.orderplacing.types.Failure
-import com.codigomorsa.orderplacing.types.Result
 import com.codigomorsa.orderplacing.types.Success
 import com.codigomorsa.orderplacing.types.UnvalidatedOrder
 import org.springframework.web.bind.annotation.GetMapping
