@@ -30,19 +30,19 @@ class OrderService(val orderRepository: OrderRepository) {
                     listOfResultsToResult(it).let { totalResult ->
                         when (totalResult) {
                             is Success -> saveOrders(totalResult.value).map {
-                                    Success("Order successfully saved!")
-                                }
+                                Success("Orders successfully saved!")
+                            }
                             is Failure -> Mono.just(totalResult)
                         }
                     }
                 }
     }
 
-    private fun saveOrders(orders: List<ValidatedOrder>): Mono<Void> {
+    private fun saveOrders(orders: List<ValidatedOrder>): Mono<Unit> {
         return Flux.fromIterable(orders.map {
             ValidatedOrderDTO.toDto(it)
         }).flatMap {
             orderRepository.save(it)
-        }.then()
+        }.then(Mono.just(Unit))
     }
 }
