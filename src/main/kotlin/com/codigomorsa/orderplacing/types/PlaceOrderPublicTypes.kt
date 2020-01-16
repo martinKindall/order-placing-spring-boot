@@ -1,5 +1,7 @@
 package com.codigomorsa.orderplacing.types
 
+import com.codigomorsa.orderplacing.implementation.ValidatedOrder
+
 data class UnvalidatedCustomerInfo(
         val firstName: String,
         val lastName: String,
@@ -25,6 +27,4 @@ data class UnvalidatedOrder(
         val unvalidOrderLines: List<UnvalidatedOrderLine>
 )
 
-interface PlaceOrder {
-    fun place(order: UnvalidatedOrder): CompletableResult<UnvalidatedOrder, Exception>   // todo: define event output
-}
+typealias PlaceOrder = (order: UnvalidatedOrder) -> CompletableResult<ValidatedOrder, Exception>
