@@ -2,6 +2,7 @@ package com.codigomorsa.orderplacing.validationStep
 
 import com.codigomorsa.orderplacing.implementation.*
 import com.codigomorsa.orderplacing.types.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -84,7 +85,7 @@ class ValidationTest {
     fun toProductCodeTest() {
         val productCode = "asd123"
         val validProductCode = toProductCode(checkProductCodeExistsTrue, productCode)
-        (validProductCode as? Success)?.value!!.let {
+        (validProductCode as Success).value.let {
             assertTrue(it.productCode.value == productCode)
         }
 
@@ -99,7 +100,7 @@ class ValidationTest {
     @Test
     fun toValidatedOrderLineTest() {
         val orderLine = toValidatedOrderLine(checkProductCodeExistsTrue, unvalidatedOrderLineCorrect)
-        (orderLine as? Success)?.value!!.let {
+        (orderLine as Success).value.let {
             assertTrue(it.productCode.productCode.value == unvalidatedOrderLineCorrect.productCode)
         }
 
@@ -112,5 +113,26 @@ class ValidationTest {
                 checkProductCodeExistsTrue,
                 unvalidatedOrderLineInCorrect) as Failure).reason
         assertTrue(invalidOrderLineProductCode.message?.contains("Product code not valid.")?: false)
+    }
+
+    @Test
+    fun toValidateOrderTest() {
+        val orderIdString = "12345"
+        val validOrder = toValidatedOrder(
+                checkProductCodeExistsTrue,
+                UnvalidatedOrder(
+                        orderIdString,
+                        unvalidatedCustomerInfoCorrect,
+                        unvalidatedAddressCorrect,
+                        listOf(unvalidatedOrderLineCorrect, unvalidatedOrderLineCorrect)
+                )
+        )
+        (validOrder as Success).value.let {
+            assertEquals(it.orderId.orderId, orderIdString.toInt())
+            assertEquals(
+                    unvalidatedOrderLineCorrect.productCode,
+                    it.lines[0].productCode.productCode.value
+            )
+        }
     }
 }
