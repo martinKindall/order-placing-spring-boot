@@ -1,8 +1,10 @@
 package com.codigomorsa.orderplacing.services
 
 import com.codigomorsa.orderplacing.Utils.listOfResultsToResult
+import com.codigomorsa.orderplacing.dto.ValidatedOrderDTO
 import com.codigomorsa.orderplacing.implementation.ValidatedOrder
 import com.codigomorsa.orderplacing.implementation.toValidatedOrder
+import com.codigomorsa.orderplacing.repositories.OrderRepository
 import com.codigomorsa.orderplacing.types.Failure
 import com.codigomorsa.orderplacing.types.Result
 import com.codigomorsa.orderplacing.types.Success
@@ -12,7 +14,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Service
-class OrderService {
+class OrderService(val orderRepository: OrderRepository) {
     private val checkProductCodeExists = {something: Any -> true}
 
     fun save(orders: Flux<UnvalidatedOrder>): Mono<Result<String, Exception>> {
@@ -27,13 +29,20 @@ class OrderService {
                 .flatMap {
                     listOfResultsToResult(it).let { totalResult ->
                         when (totalResult) {
-                            is Success -> {
-                                println("Saving to DB")
-                                Mono.just(Success("Order successfully saved!"))
-                            }
+                            is Success -> saveOrders(totalResult.value).map {
+                                    Success("Order successfully saved!")
+                                }
                             is Failure -> Mono.just(totalResult)
                         }
                     }
                 }
+    }
+
+    private fun saveOrders(orders: List<ValidatedOrder>): Mono<Void> {
+        return Flux.fromIterable(orders.map {
+            ValidatedOrderDTO.toDto(it)
+        }).flatMap {
+            orderRepository.save(it)
+        }.then()
     }
 }

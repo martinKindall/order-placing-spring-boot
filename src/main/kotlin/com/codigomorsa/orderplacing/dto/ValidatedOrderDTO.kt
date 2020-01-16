@@ -1,10 +1,12 @@
 package com.codigomorsa.orderplacing.dto
 
 import com.codigomorsa.orderplacing.implementation.ValidatedOrder
+import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.mapping.Document
 
-
+@Document
 class ValidatedOrderDTO private constructor(
-        val orderId: Int,
+        @Id val orderId: Int,
         val customerInfo: CustomerInfoDTO,
         val address: AddressDTO,
         val lines: List<Int>
