@@ -81,6 +81,17 @@ fun toValidatedOrderLine(
     return bind(validatedOrderLineAux, toProductCode(checkProductCodeExists, unvalidatedOrderLine.productCode))
 }
 
+fun toValidatedOrder(
+        checkProductCodeExists: CheckProductCodeExists,
+        unvalidatedOrder: UnvalidatedOrder
+) {
+    val customerInfo = toCustomerInfo(unvalidatedOrder.customerInfo)
+    val address = toAddress(unvalidatedOrder.shippingAddress)
+    val orderLinesResults = unvalidatedOrder.unvalidOrderLines.map {
+        toValidatedOrderLine(checkProductCodeExists, it)
+    }
+}
+
 private fun getErrorFromListOfResults(results: List<Result<Any, Exception>>): Exception {
     results.filter {
         it is Failure

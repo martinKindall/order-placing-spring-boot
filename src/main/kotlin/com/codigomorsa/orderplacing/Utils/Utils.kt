@@ -12,3 +12,25 @@ fun <T, Y>bind(aFun: SwitchFun<T, Y>, anArgument: Result<T, Exception>): Result<
         is Failure -> anArgument
     }
 }
+
+fun <T>listOfResultsToResult(results: List<Result<T, Exception>>): Result<List<T>, Exception> {
+    val initialVal = Success(listOf<T>())
+
+    return results.fold(initialVal, {acc: Result<List<T>, Exception>, result ->
+        prepend(result, acc)
+    })
+}
+
+private fun <T>prepend(
+        firstR: Result<T, Exception>,
+        restR: Result<List<T>, Exception>): Result<List<T>, Exception> {
+
+    return if (firstR is Success && restR is Success) {
+        val newList = restR.value + listOf(firstR.value)
+        Success(newList)
+    } else if (firstR is Failure) {
+        firstR
+    } else {
+        restR
+    }
+}
