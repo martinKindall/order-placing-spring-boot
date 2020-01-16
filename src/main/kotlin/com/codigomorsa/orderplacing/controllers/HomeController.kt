@@ -26,13 +26,12 @@ class HomeController {
 
     @PostMapping("/order")
     fun create(
-            @RequestBody order: Mono<UnvalidatedOrder>
-    ): Mono<Result<ValidatedOrder, Exception>> {
+            @RequestBody order: Flux<UnvalidatedOrder>
+    ): Mono<String> {
         val checkProductCodeExists = {code: Any -> true}
 
-        return order.flatMap {
-            val orderResult = toValidatedOrder(checkProductCodeExists, it)
-            Mono.just(orderResult)
-        }
+        return order.map {
+            toValidatedOrder(checkProductCodeExists, it)
+        }.then(Mono.just("Data saved!"))
     }
 }
