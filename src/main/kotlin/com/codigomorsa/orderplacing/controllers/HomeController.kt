@@ -1,6 +1,13 @@
 package com.codigomorsa.orderplacing.controllers
 
+import com.codigomorsa.orderplacing.implementation.ValidatedOrder
+import com.codigomorsa.orderplacing.implementation.toValidatedOrder
+import com.codigomorsa.orderplacing.types.Failure
+import com.codigomorsa.orderplacing.types.ProductCode
+import com.codigomorsa.orderplacing.types.Result
+import com.codigomorsa.orderplacing.types.Success
 import com.codigomorsa.orderplacing.types.UnvalidatedOrder
+import kotlinx.coroutines.reactive.collect
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -19,10 +26,13 @@ class HomeController {
 
     @PostMapping("/order")
     fun create(
-            @RequestBody order: Flux<UnvalidatedOrder>
-    ): Mono<String> {
-        return order.map {
-            println(it.toString())
-        }.then(Mono.just("Hello there"))
+            @RequestBody order: Mono<UnvalidatedOrder>
+    ): Mono<Result<ValidatedOrder, Exception>> {
+        val checkProductCodeExists = {code: Any -> true}
+
+        return order.flatMap {
+            val orderResult = toValidatedOrder(checkProductCodeExists, it)
+            Mono.just(orderResult)
+        }
     }
 }
