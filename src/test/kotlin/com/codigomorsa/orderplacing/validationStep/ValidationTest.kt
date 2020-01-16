@@ -1,9 +1,6 @@
 package com.codigomorsa.orderplacing.validationStep
 
-import com.codigomorsa.orderplacing.implementation.CheckProductCodeExists
-import com.codigomorsa.orderplacing.implementation.toAddress
-import com.codigomorsa.orderplacing.implementation.toCustomerInfo
-import com.codigomorsa.orderplacing.implementation.toProductCode
+import com.codigomorsa.orderplacing.implementation.*
 import com.codigomorsa.orderplacing.types.*
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -17,6 +14,8 @@ class ValidationTest {
     private lateinit var unvalidatedAddressTooLong: UnvalidatedAddress
     private lateinit var checkProductCodeExistsTrue: CheckProductCodeExists
     private lateinit var checkProductCodeExistsFalse: CheckProductCodeExists
+    private lateinit var unvalidatedOrderLineCorrect: UnvalidatedOrderLine
+    private lateinit var unvalidatedOrderLineInCorrect: UnvalidatedOrderLine
 
     init {
         unvalidatedCustomerInfoCorrect = UnvalidatedCustomerInfo(
@@ -46,6 +45,12 @@ class ValidationTest {
         )
         checkProductCodeExistsTrue = {true}
         checkProductCodeExistsFalse = {false}
+
+        unvalidatedOrderLineCorrect = UnvalidatedOrderLine(
+                "123",
+                "abc456",
+                OrderQuantity.create(12)
+        )
     }
 
     @Test
@@ -83,5 +88,13 @@ class ValidationTest {
         val productCodeTooLong = "sadfasdfasdfasdfasdfasdfadfasdfasdfasdfasdfasdfasdfasdf"
         val exception2 = (toProductCode(checkProductCodeExistsTrue, productCodeTooLong) as Failure).reason
         assertTrue(exception2.message?.contains("Product code not valid.")?: false)
+    }
+
+    @Test
+    fun toValidatedOrderLineTest() {
+        val orderLine = toValidatedOrderLine(checkProductCodeExistsTrue, unvalidatedOrderLineCorrect)
+        (orderLine as? Success)?.value!!.let {
+            assertTrue(it.productCode.productCode.value == unvalidatedOrderLineCorrect.productCode)
+        }
     }
 }
