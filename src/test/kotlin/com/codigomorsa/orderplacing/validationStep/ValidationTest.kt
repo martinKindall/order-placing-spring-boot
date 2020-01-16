@@ -116,7 +116,7 @@ class ValidationTest {
     }
 
     @Test
-    fun toValidateOrderTest() {
+    fun toValidatedOrderTest() {
         val orderIdString = "12345"
         val validOrder = toValidatedOrder(
                 checkProductCodeExistsTrue,
@@ -134,5 +134,51 @@ class ValidationTest {
                     it.lines[0].productCode.productCode.value
             )
         }
+
+        val invalidOrder = (toValidatedOrder(
+                checkProductCodeExistsFalse,
+                UnvalidatedOrder(
+                        orderIdString,
+                        unvalidatedCustomerInfoCorrect,
+                        unvalidatedAddressCorrect,
+                        listOf(unvalidatedOrderLineCorrect, unvalidatedOrderLineCorrect)
+                )
+        ) as Failure).reason
+        assertTrue(invalidOrder.message?.contains("Product code doesn't exist")?: false)
+
+        val invalidOrder2 = (toValidatedOrder(
+                checkProductCodeExistsTrue,
+                UnvalidatedOrder(
+                        orderIdString,
+                        unvalidatedCustomerInfoInCorrectName,
+                        unvalidatedAddressCorrect,
+                        listOf(unvalidatedOrderLineCorrect, unvalidatedOrderLineCorrect)
+                )
+        ) as Failure).reason
+        assertTrue(
+                invalidOrder2.message
+                        ?.contains("String must be not greater than 50 characters.")?: false)
+
+        val invalidOrder3 = (toValidatedOrder(
+                checkProductCodeExistsTrue,
+                UnvalidatedOrder(
+                        orderIdString,
+                        unvalidatedCustomerInfoCorrect,
+                        unvalidatedAddressCorrect,
+                        listOf(unvalidatedOrderLineInCorrect, unvalidatedOrderLineCorrect)
+                )
+        ) as Failure).reason
+        assertTrue(invalidOrder3.message?.contains("Product code not valid.")?: false)
+
+        val invalidOrder4 = (toValidatedOrder(
+                checkProductCodeExistsTrue,
+                UnvalidatedOrder(
+                        orderIdString,
+                        unvalidatedCustomerInfoCorrect,
+                        unvalidatedAddressCorrect,
+                        listOf(unvalidatedOrderLineCorrect, unvalidatedOrderLineInCorrect)
+                )
+        ) as Failure).reason
+        assertTrue(invalidOrder4.message?.contains("Product code not valid.")?: false)
     }
 }
