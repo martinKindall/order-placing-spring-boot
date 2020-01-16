@@ -27,11 +27,21 @@ class HomeController {
     @PostMapping("/order")
     fun create(
             @RequestBody order: Flux<UnvalidatedOrder>
-    ): Mono<String> {
+    ): Mono<List<ValidatedOrder>> {
         val checkProductCodeExists = {code: Any -> true}
 
         return order.map {
             toValidatedOrder(checkProductCodeExists, it)
-        }.then(Mono.just("Data saved!"))
+        }.reduce(
+                listOf(),
+                {
+                    acc: List<ValidatedOrder>,
+                    res: Result<ValidatedOrder, Exception> ->
+            if (res is Success) {
+                acc + listOf(res.value)
+            } else {
+                throw IllegalArgumentException("Not a valid order.")
+            }
+        })
     }
 }
