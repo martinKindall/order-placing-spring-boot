@@ -51,6 +51,12 @@ class ValidationTest {
                 "abc456",
                 OrderQuantity.create(12)
         )
+
+        unvalidatedOrderLineInCorrect = UnvalidatedOrderLine(
+                "123",
+                "janeadfadsdfasdfasdfasdfadfasfasjaneadfadsdfasdfasdfasdfadfasfas",
+                OrderQuantity.create(12)
+        )
     }
 
     @Test
@@ -96,5 +102,15 @@ class ValidationTest {
         (orderLine as? Success)?.value!!.let {
             assertTrue(it.productCode.productCode.value == unvalidatedOrderLineCorrect.productCode)
         }
+
+        val invalidOrderLine = (toValidatedOrderLine(
+                checkProductCodeExistsFalse,
+                unvalidatedOrderLineCorrect) as Failure).reason
+        assertTrue(invalidOrderLine.message?.contains("Product code doesn't exist")?: false)
+
+        val invalidOrderLineProductCode = (toValidatedOrderLine(
+                checkProductCodeExistsTrue,
+                unvalidatedOrderLineInCorrect) as Failure).reason
+        assertTrue(invalidOrderLineProductCode.message?.contains("Product code not valid.")?: false)
     }
 }
