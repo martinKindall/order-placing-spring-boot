@@ -17,6 +17,10 @@ import reactor.core.publisher.Mono
 class OrderService(val orderRepository: OrderRepository) {
     private val checkProductCodeExists = {something: Any -> true}
 
+    fun findAll(): Flux<ValidatedOrderDTO> {
+        return orderRepository.findAll()
+    }
+
     fun save(orders: Flux<UnvalidatedOrder>): Mono<Result<String, Exception>> {
         return orders.map {
             toValidatedOrder(checkProductCodeExists, it)

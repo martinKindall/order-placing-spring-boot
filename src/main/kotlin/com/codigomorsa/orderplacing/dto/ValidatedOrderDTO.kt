@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class ValidatedOrderDTO private constructor(
+class ValidatedOrderDTO(
         @Id val orderId: Int,
         val customerInfo: CustomerInfoDTO,
         val address: AddressDTO,

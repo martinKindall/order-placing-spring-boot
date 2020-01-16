@@ -3,7 +3,7 @@ package com.codigomorsa.orderplacing.dto
 import com.codigomorsa.orderplacing.types.Address
 
 
-class AddressDTO private constructor(
+class AddressDTO(
         val address: String,
         val city: String,
         val zipCode: String

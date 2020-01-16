@@ -3,7 +3,7 @@ package com.codigomorsa.orderplacing.dto
 import com.codigomorsa.orderplacing.types.CustomerInfo
 
 
-class CustomerInfoDTO private constructor(
+class CustomerInfoDTO(
         val firstName: String,
         val lastName: String,
         val emailAddress: String

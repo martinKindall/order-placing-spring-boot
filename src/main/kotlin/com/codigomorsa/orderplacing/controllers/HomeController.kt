@@ -1,5 +1,7 @@
 package com.codigomorsa.orderplacing.controllers
 
+import com.codigomorsa.orderplacing.dto.ValidatedOrderDTO
+import com.codigomorsa.orderplacing.implementation.ValidatedOrder
 import com.codigomorsa.orderplacing.services.OrderService
 import com.codigomorsa.orderplacing.types.Failure
 import com.codigomorsa.orderplacing.types.Success
@@ -18,6 +20,11 @@ class HomeController(private val orderService: OrderService) {
     @GetMapping("/")
     fun home(): String {
         return "Hi there!"
+    }
+
+    @GetMapping("/order")
+    fun getAllOrders(): Flux<ValidatedOrderDTO> {
+        return orderService.findAll()
     }
 
     @PostMapping("/order")
