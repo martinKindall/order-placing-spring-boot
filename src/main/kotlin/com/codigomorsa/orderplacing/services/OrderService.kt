@@ -2,8 +2,10 @@ package com.codigomorsa.orderplacing.services
 
 import com.codigomorsa.orderplacing.Utils.listOfResultsToResult
 import com.codigomorsa.orderplacing.dto.ValidatedOrderDTO
+import com.codigomorsa.orderplacing.dto.ValidatedOrderLineDTO
 import com.codigomorsa.orderplacing.implementation.ValidatedOrder
 import com.codigomorsa.orderplacing.implementation.toValidatedOrder
+import com.codigomorsa.orderplacing.repositories.OrderLineRepository
 import com.codigomorsa.orderplacing.repositories.OrderRepository
 import com.codigomorsa.orderplacing.types.Failure
 import com.codigomorsa.orderplacing.types.Result
@@ -14,7 +16,9 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Service
-class OrderService(val orderRepository: OrderRepository) {
+class OrderService(
+        val orderRepository: OrderRepository,
+        val orderLineRepository: OrderLineRepository) {
     private val checkProductCodeExists = {something: Any -> true}
 
     fun findAll(): Flux<ValidatedOrderDTO> {
@@ -43,10 +47,21 @@ class OrderService(val orderRepository: OrderRepository) {
     }
 
     private fun saveOrders(orders: List<ValidatedOrder>): Mono<Unit> {
-        return Flux.fromIterable(orders.map {
+        val orderLinesObs = Flux.fromIterable(orders.flatMap {
+            it.lines
+        }).flatMap {
+            orderLineRepository.save(ValidatedOrderLineDTO.toDto(it))
+        }
+
+        val ordersObs = Flux.fromIterable(orders.map {
             ValidatedOrderDTO.toDto(it)
         }).flatMap {
             orderRepository.save(it)
-        }.then(Mono.just(Unit))
+        }
+
+        return orderLinesObs
+                .then()
+                .and(ordersObs)
+                .then(Mono.just(Unit))
     }
 }

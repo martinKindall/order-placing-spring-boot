@@ -15,7 +15,7 @@ class ValidatedOrderLineDTO(
         fun toDto(order: ValidatedOrderLine): ValidatedOrderLineDTO {
             return ValidatedOrderLineDTO(
                     order.orderLineId.orderId,
-                    order.productCode.toString(),
+                    order.productCode.productCode.value,
                     order.quantity.let {
                         when (it) {
                             is OrderQuantity.UnitQuantity -> it.quantity.toFloat()
